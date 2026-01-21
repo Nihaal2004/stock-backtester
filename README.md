@@ -36,6 +36,17 @@ Build a lightweight, user-friendly “Strategy Backtester Lite” that allows us
 
 ## User Stories + MoSCoW
 
+### MoSCoW Prioritization
+
+| Priority | User Stories | Rationale |
+|---|---|---|
+| Must | US-01 to US-10 | Core workflow required for an end-to-end demo: upload → strategy → backtest → results. |
+| Should | US-11 to US-18 | Improves usability and realism but not required for a basic working prototype. |
+| Could | US-19 to US-23 | Enhancements for comparison, reporting, and UX polish if time permits. |
+| Won’t | US-24 to US-25 | Out of scope to keep the project small and educational (no real trading, no prediction). |
+
+
+
 ## Wireframes
 - Figma Link:
 - Exports in /wireframes
