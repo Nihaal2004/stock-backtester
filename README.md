@@ -66,12 +66,12 @@ Build a lightweight, user-friendly “Strategy Backtester Lite” that allows us
 
 ```bash
 docker compose up --build
-
+```
 ### Run locally (without Docker)
 ```bash
 pip install -r src/requirements.txt
 streamlit run src/app.py
-
+```
 
 
 ## Local Development Tools
