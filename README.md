@@ -53,6 +53,7 @@ Build a lightweight, user-friendly “Strategy Backtester Lite” that allows us
 
 ## Architecture Diagram
 - Exports in /diagrams
+- Export: /diagrams/Architecture.png
 
 ## Branching Strategy
 
