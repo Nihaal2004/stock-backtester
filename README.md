@@ -78,3 +78,47 @@ streamlit run src/app.py
 
 ## Proof / Screenshots
 - Stored in /screenshots
+
+## Test Plan
+
+### Test Cases
+
+| TC ID | Scenario | Input/Setup | Steps | Expected Result |
+|---|---|---|---|---|
+| TC-01 | Valid CSV upload | CSV with Date, Close | Upload file | File loads; preview shown; no error |
+| TC-02 | Missing required column | CSV missing Date or Close | Upload file | Clear error: missing columns; app stops safely |
+| TC-03 | Invalid date values | Date column has invalid strings | Upload file | Invalid rows dropped; if too few rows remain show error |
+| TC-04 | Non-numeric Close | Close has text values | Upload file | Non-numeric rows dropped; app continues or shows “not enough rows” |
+| TC-05 | SMA fast >= slow | Fast=10 Slow=10 | Select SMA; run | Error shown; backtest not executed |
+| TC-06 | SMA window > data length | Slow SMA larger than rows | Select SMA; run | Error: not enough rows for Slow SMA; no crash |
+| TC-07 | RSI buy >= sell | Buy=70 Sell=30 | Select RSI; run | Error shown; backtest not executed |
+| TC-08 | RSI period > data length | Period larger than rows | Select RSI; run | Error: not enough rows for RSI period; no crash |
+| TC-09 | No-trade scenario | Params that produce no entries | Run backtest | Warning shown; equity curve flat; metrics still display |
+| TC-10 | Docker run | Docker installed | `docker compose up --build` then open localhost | App accessible at http://localhost:8501 |
+
+## Functional Requirements (for Traceability)
+- FR-01: Upload CSV with required columns (Date, Close)
+- FR-02: Validate input file and show clear errors
+- FR-03: Allow strategy selection (SMA / RSI)
+- FR-04: Allow parameter configuration for the selected strategy
+- FR-05: Run backtest using next-day execution rule
+- FR-06: Display equity curve
+- FR-07: Display key metrics (Total Return, CAGR, Max Drawdown, Win Rate, #Trades)
+- FR-08: Display trade log table
+- FR-09: Support optional date range selection
+- FR-10: Run application via Docker
+
+## Traceability Matrix (FR ↔ Test Cases)
+
+| Requirement | Covered By Test Cases |
+|---|---|
+| FR-01 | TC-01 |
+| FR-02 | TC-02, TC-03, TC-04 |
+| FR-03 | TC-05, TC-07 |
+| FR-04 | TC-05, TC-06, TC-07, TC-08 |
+| FR-05 | TC-01, TC-05, TC-07 |
+| FR-06 | TC-01, TC-09 |
+| FR-07 | TC-01, TC-09 |
+| FR-08 | TC-01 |
+| FR-09 | TC-01 |
+| FR-10 | TC-10 |
