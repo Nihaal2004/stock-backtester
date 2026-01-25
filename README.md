@@ -58,6 +58,21 @@ Build a lightweight, user-friendly “Strategy Backtester Lite” that allows us
 ## Branching Strategy
 
 ## Quick Start – Local Development (Docker)
+### What it does
+- Upload CSV (required columns: Date, Close)
+- Choose strategy: SMA Crossover or RSI Threshold
+- Run backtest (next-day execution)
+- View equity curve, key metrics, and trade log
+
+```bash
+docker compose up --build
+
+### Run locally (without Docker)
+```bash
+pip install -r src/requirements.txt
+streamlit run src/app.py
+
+
 
 ## Local Development Tools
 
