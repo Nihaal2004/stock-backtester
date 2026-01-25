@@ -48,7 +48,7 @@ Build a lightweight, user-friendly “Strategy Backtester Lite” that allows us
 
 
 ## Wireframes
-- Figma Link:
+- Figma Link: https://www.figma.com/design/9AgSClvrB4onGZlJ19ogbf/nihaal?node-id=0-1&t=nmizP5MyeNEyDcvN-1
 - Exports in /wireframes
 
 ## Architecture Diagram
