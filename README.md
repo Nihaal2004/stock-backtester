@@ -56,7 +56,7 @@ Build a lightweight, user-friendly “Strategy Backtester Lite” that allows us
 - Export: /diagrams/Architecture.png
 
 ## Branching Strategy
-
+- PR proof: merged feature branch into main
 ## Quick Start – Local Development (Docker)
 ### What it does
 - Upload CSV (required columns: Date, Close)
