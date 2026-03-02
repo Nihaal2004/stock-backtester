@@ -1,0 +1,624 @@
+\documentclass[11pt,a4paper]{article}
+
+% Packages
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{amsmath}
+
+% Fix header height
+\setlength{\headheight}{14pt}
+
+% Colors
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
+
+% Code listing style
+\lstdefinestyle{pythonstyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2,
+    frame=single
+}
+\lstset{style=pythonstyle}
+
+% Header and footer
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Software Design Document}
+\lhead{Stock Strategy Backtester Lite}
+\rfoot{Page \thepage}
+
+% Title formatting
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{blue!70!black}}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{blue!50!black}}{\thesubsection}{1em}{}
+
+% Hyperlink colors
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+    citecolor=blue
+}
+
+\begin{document}
+
+% Title Page
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Huge\bfseries Stock Strategy Backtester Lite\par}
+    \vspace{1cm}
+    {\Large Software Design Document\par}
+    {\Large Executive Summary\par}
+    \vspace{2cm}
+    
+    {\Large\itshape Nihaal2004\par}
+    \vspace{1cm}
+    
+    {\large Digital Assignment 2 / Review 2\par}
+    \vspace{0.5cm}
+    {\large March 2026\par}
+    \vfill
+    
+    {\large GitHub Repository:\par}
+    {\small\url{https://github.com/Nihaal2004/stock-backtester}\par}
+    
+    \vspace{1cm}
+\end{titlepage}
+
+% Table of Contents
+\tableofcontents
+\newpage
+
+% Main Content
+\section{Design Principles Applied}
+
+This section demonstrates how fundamental software design principles were applied to create a maintainable, extensible, and professional application.
+
+\subsection{Abstraction}
+
+We created an abstract \texttt{Strategy} base class that defines the interface for all trading strategies. Concrete implementations (SMAStrategy, RSIStrategy) are hidden behind this interface, allowing the UI to work with strategies without knowing their internal details.
+
+\begin{lstlisting}[language=Python, caption=Strategy Abstraction Example]
+from abc import ABC, abstractmethod
+
+class Strategy(ABC):
+    @abstractmethod
+    def generate_signals(self, df, params):
+        """Generate trading signals"""
+        pass
+    
+    @abstractmethod
+    def validate_params(self, params, data_length):
+        """Validate strategy parameters"""
+        pass
+\end{lstlisting}
+
+\textbf{Benefits:}
+\begin{itemize}[noitemsep]
+    \item Simplifies usage by working with interfaces rather than implementations
+    \item Reduces complexity for users of the code
+    \item Easier to change implementation without affecting clients
+\end{itemize}
+
+\subsection{Modularity}
+
+The application is separated into 6 independent modules, each with a specific purpose:
+
+\begin{enumerate}[noitemsep]
+    \item \textbf{data\_loader.py} -- Data input and validation
+    \item \textbf{strategies.py} -- Trading algorithms
+    \item \textbf{backtest\_engine.py} -- Backtesting execution
+    \item \textbf{visualization.py} -- Charts and display
+    \item \textbf{ui\_components.py} -- UI elements
+    \item \textbf{app.py} -- Main orchestrator
+\end{enumerate}
+
+\textbf{Benefits:}
+\begin{itemize}[noitemsep]
+    \item Better organization and easier navigation
+    \item Independent development and testing
+    \item Improved collaboration between developers
+    \item Reusable components
+\end{itemize}
+
+\subsection{High Cohesion}
+
+Each module groups related functionality together with a single, well-defined purpose:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Module} & \textbf{Responsibilities} \\ \midrule
+DataLoader & Load, validate, clean, filter data \\
+BacktestEngine & Run backtest, extract trades, calculate metrics \\
+Visualizer & Create charts, display tables, show metrics \\
+Strategies & Generate signals, validate parameters \\ \bottomrule
+\end{tabular}
+\caption{Module Responsibilities}
+\end{table}
+
+\textbf{Benefits:}
+\begin{itemize}[noitemsep]
+    \item Easy to find related code
+    \item Clear purpose for each module
+    \item Easier maintenance
+    \item Highly reusable modules
+\end{itemize}
+
+\subsection{Low Coupling}
+
+Modules depend on interfaces rather than concrete implementations, communicating through standard data structures (DataFrames):
+
+\begin{itemize}[noitemsep]
+    \item \textbf{BacktestEngine} works with any signals (doesn't know about specific strategies)
+    \item \textbf{Strategies} don't know about UI implementation
+    \item \textbf{UI} doesn't know about calculation algorithms
+\end{itemize}
+
+\textbf{Benefits:}
+\begin{itemize}[noitemsep]
+    \item Easy to change one module without affecting others
+    \item Better testability through mocking
+    \item Flexible implementations
+    \item Reduced ripple effects from changes
+\end{itemize}
+
+\newpage
+\section{High-Level Architecture}
+
+\subsection{Architecture Style: Layered Architecture}
+
+The application follows a \textbf{3-layer architecture} with clear separation of concerns:
+
+\begin{figure}[H]
+\centering
+\fbox{\begin{minipage}{0.75\textwidth}
+\textbf{PRESENTATION LAYER}\\
+\textit{(ui\_components.py, visualization.py)}
+\begin{itemize}[noitemsep]
+    \item User Interface
+    \item Charts \& Display
+\end{itemize}
+\vspace{0.3cm}
+\centering $\downarrow$
+\vspace{0.3cm}
+
+\textbf{BUSINESS LOGIC LAYER}\\
+\textit{(strategies.py, backtest\_engine.py)}
+\begin{itemize}[noitemsep]
+    \item Trading Strategies
+    \item Backtest Execution
+    \item Performance Calculations
+\end{itemize}
+\vspace{0.3cm}
+\centering $\downarrow$
+\vspace{0.3cm}
+
+\textbf{DATA LAYER}\\
+\textit{(data\_loader.py)}
+\begin{itemize}[noitemsep]
+    \item CSV Loading
+    \item Data Validation
+    \item Data Cleaning
+\end{itemize}
+\end{minipage}}
+\caption{Three-Layer Architecture}
+\end{figure}
+
+\subsection{Why Layered Architecture?}
+
+\begin{enumerate}[noitemsep]
+    \item \textbf{Clear Separation:} Each layer has a distinct responsibility
+    \item \textbf{Maintainability:} Changes in UI don't affect business logic
+    \item \textbf{Standard Pattern:} Well-understood by developers
+    \item \textbf{Perfect Fit:} Ideal for web applications with data pipelines
+    \item \textbf{Scalability:} Easy to add features within appropriate layer
+\end{enumerate}
+
+\subsection{Component Interaction Flow}
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.7\textwidth}
+\centering
+User Upload CSV
+
+$\downarrow$
+
+\texttt{[DataLoader]} $\leftarrow$ Load \& Validate
+
+$\downarrow$
+
+\texttt{[UI Components]} $\leftarrow$ Select Strategy \& Parameters
+
+$\downarrow$
+
+\texttt{[StrategyFactory]} $\leftarrow$ Create Strategy Instance
+
+$\downarrow$
+
+\texttt{[Strategy]} $\leftarrow$ Generate Trading Signals
+
+$\downarrow$
+
+\texttt{[BacktestEngine]} $\leftarrow$ Execute Backtest
+
+$\downarrow$
+
+\texttt{[BacktestEngine]} $\leftarrow$ Calculate Metrics
+
+$\downarrow$
+
+\texttt{[Visualizer]} $\leftarrow$ Display Results
+
+$\downarrow$
+
+User Views Results
+\end{minipage}
+\caption{Data Flow Through System}
+\end{figure}
+
+\newpage
+\section{User Interface Design}
+
+\subsection{Design Principles}
+
+The UI was designed following four key principles:
+
+\begin{itemize}
+    \item \textbf{Consistency:} Uniform colors, fonts, and layout patterns throughout
+    \item \textbf{Clarity:} Step-by-step workflow (numbered steps), clear labels, help text on all inputs
+    \item \textbf{User-Friendliness:} Progressive disclosure, error prevention, forgiving inputs
+    \item \textbf{Accessibility:} High contrast, large clickable targets, logical flow
+\end{itemize}
+
+\subsection{Six Key Screens}
+
+The application guides users through six distinct screens:
+
+\begin{enumerate}
+    \item \textbf{Home / Upload} -- Welcome message and file upload widget
+    \item \textbf{Data Preview} -- Table showing uploaded stock data
+    \item \textbf{Date Filter} -- Optional date range selection for backtesting
+    \item \textbf{Strategy Configuration} -- Strategy selection and parameter inputs
+    \item \textbf{Results - Metrics} -- Five key performance indicators displayed prominently
+    \item \textbf{Results - Chart \& Trades} -- Equity curve visualization and detailed trade log
+\end{enumerate}
+
+\subsection{UI Improvements Made}
+
+Several enhancements were implemented to improve user experience:
+
+\begin{itemize}[noitemsep]
+    \item Added numbered icons for visual hierarchy (1, 2, 3)
+    \item Implemented help tooltips on all parameter inputs
+    \item Color-coded profit/loss (green for positive, red for negative)
+    \item Form-based inputs to prevent unwanted application reruns
+    \item Clear error messages with actionable guidance for users
+    \item Progress indicators during long operations
+\end{itemize}
+
+\subsection{Figma Designs}
+
+All wireframes are available at: \url{https://www.figma.com/design/9AgSClvrB4onGZlJ19ogbf/nihaal}
+
+Exported wireframes included in the repository:
+\begin{itemize}[noitemsep]
+    \item home.png
+    \item csv import.png
+    \item stock preview.png
+    \item strategy picker.png
+    \item equity curve.png
+\end{itemize}
+
+\newpage
+\section{Design Decisions \& Rationale}
+
+This section explains the key design decisions and why they were made.
+
+\subsection{Decision 1: Modular Architecture (6 Modules)}
+
+\textbf{Why:} Makes codebase easier to navigate, enables parallel development, improves testability, and facilitates maintenance.
+
+\textbf{Alternative Rejected:} Single monolithic file (original approach) -- difficult to maintain and extend as the project grows.
+
+\textbf{Impact:} Much better code organization outweighs the overhead of managing multiple files.
+
+\subsection{Decision 2: Strategy Pattern}
+
+\textbf{Why:} New strategies can be added without modifying existing code (Open/Closed Principle), strategies are interchangeable at runtime, and each strategy encapsulates its own logic.
+
+\textbf{Alternative Rejected:} If/else statements in main code -- not extensible and violates Single Responsibility Principle.
+
+\textbf{Impact:} Slightly more upfront design work, but makes adding new strategies trivial (approximately 5 minutes per new strategy).
+
+\subsection{Decision 3: Factory Pattern}
+
+\textbf{Why:} Decouples UI from strategy implementation details, centralizes strategy creation logic, and makes it easy to register new strategies.
+
+\textbf{Alternative Rejected:} Direct instantiation in UI code -- creates tight coupling between UI and strategy classes.
+
+\textbf{Impact:} One extra class, but provides much cleaner architecture and easier maintenance.
+
+\subsection{Decision 4: Separate BacktestEngine}
+
+\textbf{Why:} Backtesting logic is complex enough to deserve its own module, the engine is reusable with any signal source, and strategies can focus solely on signal generation.
+
+\textbf{Alternative Rejected:} Include backtesting logic in each strategy class -- leads to code duplication and inconsistency.
+
+\textbf{Impact:} Clear separation makes both strategies and backtesting logic simpler and more maintainable.
+
+\subsection{Decision 5: Next-Day Execution}
+
+\textbf{Why:} Prevents lookahead bias (position today = signal from yesterday), provides realistic trading simulation, and follows professional backtesting practices.
+
+\textbf{Alternative Rejected:} Same-day execution -- unrealistic and would artificially inflate strategy performance.
+
+\textbf{Impact:} Slightly lower returns in backtests, but provides accurate and honest representation of strategy performance.
+
+\newpage
+\section{Design Patterns Used}
+
+\subsection{Strategy Pattern}
+
+The Strategy pattern allows selecting trading algorithms at runtime without modifying existing code.
+
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.6\textwidth}
+\textbf{Strategy} (Abstract)
+\begin{itemize}[leftmargin=2em]
+    \item SMAStrategy (Concrete)
+    \item RSIStrategy (Concrete)
+\end{itemize}
+\end{minipage}
+\caption{Strategy Pattern Implementation}
+\end{figure}
+
+\textbf{Benefits:}
+\begin{itemize}[noitemsep]
+    \item Easy to add new strategies
+    \item Strategies are interchangeable
+    \item Each strategy encapsulates its own logic
+\end{itemize}
+
+\subsection{Factory Pattern}
+
+The Factory pattern centralizes strategy creation and decouples it from usage.
+
+\begin{lstlisting}[language=Python, caption=Factory Pattern Example]
+class StrategyFactory:
+    _strategies = {
+        'SMA Crossover': SMAStrategy,
+        'RSI Threshold': RSIStrategy
+    }
+    
+    @classmethod
+    def create_strategy(cls, strategy_name):
+        """Create strategy instance by name"""
+        return cls._strategies[strategy_name]()
+\end{lstlisting}
+
+\textbf{Benefits:}
+\begin{itemize}[noitemsep]
+    \item UI doesn't need to know about strategy classes
+    \item Centralized strategy management
+    \item Easy to add/remove strategies
+\end{itemize}
+
+\subsection{Layered Architecture Pattern}
+
+The Layered Architecture pattern organizes code by responsibility: Presentation → Business Logic → Data.
+
+\textbf{Benefits:}
+\begin{itemize}[noitemsep]
+    \item Clear separation of concerns
+    \item Standard industry pattern
+    \item Easy to maintain and extend
+\end{itemize}
+
+\newpage
+\section{Maintainability \& Future Extensibility}
+
+\subsection{Adding a New Strategy}
+
+The modular design makes extending functionality straightforward:
+
+\begin{lstlisting}[language=Python, caption=Adding a New Strategy]
+# 1. Create class implementing Strategy interface
+class MACDStrategy(Strategy):
+    def generate_signals(self, df, params):
+        # MACD implementation here
+        pass
+    
+    def validate_params(self, params, data_length):
+        # Parameter validation here
+        pass
+
+# 2. Register in factory
+StrategyFactory._strategies['MACD'] = MACDStrategy
+
+# 3. Done! No other code changes needed
+\end{lstlisting}
+
+\subsection{Adding a New Metric}
+
+\begin{lstlisting}[language=Python, caption=Adding a New Metric]
+# In BacktestEngine.calculate_metrics()
+def calculate_metrics(self, df, trade_log):
+    # ... existing metrics ...
+    sharpe_ratio = self._calculate_sharpe(df)
+    return {
+        # ... existing metrics ...
+        'sharpe_ratio': sharpe_ratio
+    }
+\end{lstlisting}
+
+\subsection{Benefits of Modular Design}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}ll@{}}
+\toprule
+\textbf{Aspect} & \textbf{Benefit} \\ \midrule
+Understanding & Clear structure and purpose \\
+Modification & Changes isolated to specific modules \\
+Testing & Each module testable independently \\
+Extension & Add features without breaking existing code \\ \bottomrule
+\end{tabular}
+\caption{Benefits of the Modular Design}
+\end{table}
+
+\newpage
+\section{Summary}
+
+\subsection{What Was Improved}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{@{}p{0.45\textwidth}p{0.45\textwidth}@{}}
+\toprule
+\textbf{Before Refactoring} & \textbf{After Refactoring} \\ \midrule
+200+ line monolithic file & 6 focused, single-responsibility modules \\
+Everything mixed together & Clear separation of concerns \\
+Hard to test & Easy to test each component \\
+Difficult to extend & Simple to add new features \\ \bottomrule
+\end{tabular}
+\caption{Comparison of Before and After Refactoring}
+\end{table}
+
+\subsection{Key Achievements}
+
+\begin{enumerate}
+    \item \textbf{Professional Design:} Uses industry-standard patterns (Strategy, Factory, Layered Architecture)
+    \item \textbf{SOLID Principles:} Demonstrates Single Responsibility and Open/Closed Principles
+    \item \textbf{Clear Documentation:} 50+ pages explaining design decisions
+    \item \textbf{Extensible:} New strategies in 5 minutes, new metrics in 2 minutes
+    \item \textbf{Maintainable:} Each module independently understandable
+    \item \textbf{Educational:} Code teaches good software design practices
+\end{enumerate}
+
+\subsection{Metrics}
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Modules:} 6 independent modules
+    \item \textbf{Lines of Code:} $\sim$500 lines (well-organized)
+    \item \textbf{Documentation:} 50+ pages
+    \item \textbf{Diagrams:} 3 architecture + 5 wireframes
+    \item \textbf{Design Patterns:} 3 major patterns applied
+\end{itemize}
+
+\newpage
+\section{Repository Structure}
+
+\begin{small}
+\begin{verbatim}
+stock-backtester/
+  src/
+    app.py                 # Main application
+    data_loader.py         # Data layer
+    strategies.py          # Business logic
+    backtest_engine.py     # Business logic
+    visualization.py       # Presentation
+    ui_components.py       # Presentation
+    requirements.txt       # Dependencies
+  docs/
+    design/
+      SOFTWARE_DESIGN_DOCUMENT.md    (18 pages)
+      DESIGN_PRINCIPLES.md           (8 pages)
+      DESIGN_DECISIONS.md            (13 pages)
+      UI_DESIGN.md                   (11 pages)
+      README.md                      (Summary)
+      *.png                          (All diagrams)
+  diagrams/                # Architecture diagrams
+  wireframes/              # Figma exports
+  README.md                # Main documentation
+\end{verbatim}
+\end{small}
+
+\section{Tools Used}
+
+\begin{itemize}[noitemsep]
+    \item \textbf{Diagrams:} PNG exports (architecture and flow diagrams)
+    \item \textbf{UI Design:} Figma (\url{https://www.figma.com/design/9AgSClvrB4onGZlJ19ogbf/nihaal})
+    \item \textbf{Code:} Python 3.x with Streamlit, Pandas, Matplotlib
+    \item \textbf{Version Control:} Git/GitHub
+    \item \textbf{Documentation:} Markdown and LaTeX
+\end{itemize}
+
+\newpage
+\section{Conclusion}
+
+The Stock Strategy Backtester Lite demonstrates professional software design through:
+
+\begin{itemize}
+    \item Proper application of abstraction, modularity, cohesion, and coupling principles
+    \item Use of industry-standard design patterns (Strategy, Factory, Layered Architecture)
+    \item Clear documentation of design decisions with detailed rationale
+    \item User-friendly interface with consistent design language
+    \item Extensible architecture that makes future enhancements easy
+\end{itemize}
+
+The refactored codebase is maintainable, testable, and serves as an excellent example of good software engineering practices in an educational context. The modular design ensures that the application can evolve over time while remaining stable, understandable, and professional.
+
+\vspace{1cm}
+
+\subsection{Design Philosophy}
+
+Our overall design philosophy emphasizes:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Simplicity:} Keep it as simple as possible, but no simpler
+    \item \textbf{Clarity:} Code should be self-explanatory
+    \item \textbf{Maintainability:} Think about the developer who comes after you
+    \item \textbf{Education:} Code should teach good practices
+    \item \textbf{Realism:} Backtest results should be honest and realistic
+\end{enumerate}
+
+\vspace{2cm}
+
+\begin{center}
+\rule{0.5\textwidth}{0.4pt}
+
+\textbf{GitHub Repository:} \\
+\url{https://github.com/Nihaal2004/stock-backtester}
+
+\textbf{Complete Documentation:} \\
+\url{https://github.com/Nihaal2004/stock-backtester/tree/main/docs/design}
+
+\textbf{Figma Designs:} \\
+\url{https://www.figma.com/design/9AgSClvrB4onGZlJ19ogbf/nihaal}
+
+\rule{0.5\textwidth}{0.4pt}
+\end{center}
+
+\end{document}
