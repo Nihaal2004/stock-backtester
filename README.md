@@ -49,11 +49,194 @@ Build a lightweight, user-friendly “Strategy Backtester Lite” that allows us
 
 ## Wireframes
 - Figma Link: https://www.figma.com/design/9AgSClvrB4onGZlJ19ogbf/nihaal?node-id=0-1&t=nmizP5MyeNEyDcvN-1
-- Exports in /wireframes
+- Exports in /wireframes and /docs/design
 
-## Architecture Diagram
-- Exports in /diagrams
-- Export: /diagrams/Architecture.png
+---
+
+## Software Design
+
+### Overview
+The Stock Strategy Backtester Lite has been refactored using **modular design principles** to ensure maintainability, extensibility, and clarity. The codebase demonstrates professional software engineering practices including abstraction, high cohesion, low coupling, and design patterns.
+
+### Architecture Style: Layered Architecture
+
+The application follows a **3-layer architecture** with clear separation of concerns:
+
+```
+┌─────────────────────────────────────┐
+│     PRESENTATION LAYER              │
+│  (UI Components, Visualization)     │
+└────────────┬────────────────────────┘
+             │
+┌────────────▼────────────────────────┐
+│     BUSINESS LOGIC LAYER            │
+│  (Strategies, Backtest Engine)      │
+└────────────┬────────────────────────┘
+             │
+┌────────────▼────────────────────────┐
+│     DATA LAYER                      │
+│  (Data Loading, Validation)         │
+└─────────────────────────────────────┘
+```
+
+**Why Layered Architecture?**
+- Clear separation between UI, business logic, and data handling
+- Changes in one layer don't affect others
+- Each layer has a well-defined responsibility
+- Perfect fit for data pipeline workflow (load → process → display)
+
+### Module Structure
+
+The application consists of **6 independent modules**, each with a single responsibility:
+
+| Module | Responsibility | Key Classes |
+|--------|---------------|-------------|
+| `data_loader.py` | CSV loading, validation, cleaning | `DataLoader` |
+| `strategies.py` | Trading strategy algorithms | `Strategy`, `SMAStrategy`, `RSIStrategy`, `StrategyFactory` |
+| `backtest_engine.py` | Backtest execution, metrics | `BacktestEngine` |
+| `visualization.py` | Charts, result display | `Visualizer` |
+| `ui_components.py` | Streamlit UI elements | `UIComponents` |
+| `app.py` | Application orchestration | `main()` |
+
+### Design Principles Applied
+
+#### 1. **Abstraction**
+- Abstract `Strategy` base class defines interface for all trading strategies
+- Concrete implementations (SMA, RSI) hidden behind abstraction
+- UI code works with strategy interface without knowing implementation details
+
+#### 2. **Modularity**
+- Application separated into 6 focused modules
+- Each module is independently developed, tested, and maintained
+- Modules communicate through well-defined interfaces (DataFrames, dictionaries)
+
+#### 3. **High Cohesion**
+- Each module has a single, well-defined purpose
+- All related functionality grouped together (e.g., all data operations in `DataLoader`)
+- No mixing of concerns (e.g., UI code doesn't contain calculation logic)
+
+#### 4. **Low Coupling**
+- Modules depend on interfaces, not concrete implementations
+- `BacktestEngine` doesn't know about specific strategies—just works with signals
+- UI doesn't know about algorithm details—uses `StrategyFactory`
+- Changes in one module don't cascade through the system
+
+### Design Patterns Used
+
+#### **Strategy Pattern**
+Allows selecting trading algorithm at runtime without modifying existing code.
+```python
+Strategy (Abstract)
+├── SMAStrategy
+└── RSIStrategy
+```
+
+**Benefits:**
+- Easy to add new strategies (Open/Closed Principle)
+- Strategies are interchangeable
+- Each strategy encapsulates its own logic
+
+#### **Factory Pattern**
+Centralizes strategy creation and decouples UI from strategy classes.
+```python
+strategy = StrategyFactory.create_strategy("SMA Crossover")
+```
+
+**Benefits:**
+- UI doesn't need to know about strategy classes
+- One place to manage all strategies
+- Easy to add/remove strategies from the system
+
+### Key Design Decisions
+
+#### Decision 1: Separate BacktestEngine from Strategies
+**Rationale:** Backtesting logic is complex and reusable. Strategies should only generate signals, not execute trades.
+
+**Benefit:** Same engine works with all strategies. Improvements to backtesting benefit all strategies simultaneously.
+
+#### Decision 2: Next-Day Execution
+**Rationale:** Prevents lookahead bias. Position today = signal from yesterday.
+
+**Benefit:** Realistic, educational, professional backtesting methodology.
+
+#### Decision 3: Form-Based UI Parameters
+**Rationale:** Prevents app from rerunning on every parameter change.
+
+**Benefit:** Better user experience—only recalculates when user clicks "Run Backtest."
+
+#### Decision 4: DataFrame Communication
+**Rationale:** Pandas DataFrames are industry standard for financial data.
+
+**Benefit:** Flexible, powerful, familiar to developers. Easy to add columns without breaking interfaces.
+
+#### Decision 5: Clear Error Messages
+**Rationale:** Help users fix problems themselves.
+
+**Example:** "Fast SMA (5) must be less than Slow SMA (5). Try Fast=5 and Slow=20."
+
+**Benefit:** Better user experience, educational value, reduced frustration.
+
+### Extensibility
+
+The modular design makes it easy to add features:
+
+**Adding a New Strategy:**
+```python
+# 1. Create class implementing Strategy interface
+class MACDStrategy(Strategy):
+    def generate_signals(self, df, params):
+        # Implementation
+        pass
+
+# 2. Register in StrategyFactory
+StrategyFactory._strategies['MACD'] = MACDStrategy
+```
+
+**Adding a New Metric:**
+```python
+# Add to BacktestEngine.calculate_metrics()
+def calculate_metrics(self, df, trade_log):
+    # ... existing metrics ...
+    sharpe_ratio = self._calculate_sharpe(df)
+    return {..., 'sharpe_ratio': sharpe_ratio}
+```
+
+### Documentation
+
+Complete design documentation available in `/docs/design/`:
+- 📄 **SOFTWARE_DESIGN_DOCUMENT.md** - Complete 18-page design document
+- 📄 **DESIGN_PRINCIPLES.md** - Detailed explanation of principles applied
+- 📄 **DESIGN_DECISIONS.md** - Rationale for key decisions
+- 📄 **UI_DESIGN.md** - User interface design documentation
+- 🖼️ **Architecture diagrams** - High-level and detailed architecture
+- 🖼️ **Wireframes** - All 6 UI screen designs
+
+### Architecture Diagrams
+
+![High-Level Architecture](docs/design/high%20level%20architecture.png)
+
+*Figure 1: High-level system architecture showing layered structure*
+
+![Backtest Pipeline](docs/design/backtest%20pipline.png)
+
+*Figure 2: Backtest execution pipeline*
+
+### Diagrams
+- High-level architecture: `/docs/design/high level architecture.png`
+- Detailed architecture: `/docs/design/Architecture.png`
+- Backtest pipeline: `/docs/design/backtest pipline.png`
+- All diagrams available in `/diagrams` and `/docs/design`
+
+### Summary
+
+The refactored design provides:
+- ✅ **Maintainability** - Easy to understand and modify
+- ✅ **Extensibility** - Simple to add new features
+- ✅ **Testability** - Modules can be tested independently
+- ✅ **Professional Quality** - Follows industry best practices
+- ✅ **Educational Value** - Demonstrates good software design
+
+---
 
 ## Branching Strategy
 - PR proof: merged feature branch into main
