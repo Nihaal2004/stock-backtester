@@ -12,6 +12,10 @@
 \usepackage{enumitem}
 \usepackage{booktabs}
 \usepackage{float}
+\usepackage{amsmath}
+
+% Fix header height
+\setlength{\headheight}{14pt}
 
 % Colors
 \definecolor{codegreen}{rgb}{0,0.6,0}
@@ -198,32 +202,36 @@ The application follows a \textbf{3-layer architecture} with clear separation of
 
 \begin{figure}[H]
 \centering
-\begin{minipage}{0.8\textwidth}
-\begin{verbatim}
-┌─────────────────────────────────────────────────┐
-│         PRESENTATION LAYER                      │
-│  (ui_components.py, visualization.py)           │
-│  - User Interface                               │
-│  - Charts & Display                             │
-└─────────────────┬───────────────────────────────┘
-                  │
-┌─────────────────▼───────────────────────────────┐
-│         BUSINESS LOGIC LAYER                    │
-│  (strategies.py, backtest_engine.py)            │
-│  - Trading Strategies                           │
-│  - Backtest Execution                           │
-│  - Performance Calculations                     │
-└─────────────────┬───────────────────────────────┘
-                  │
-┌─────────────────▼───────────────────────────────┐
-│         DATA LAYER                              │
-│  (data_loader.py)                               │
-│  - CSV Loading                                  │
-│  - Data Validation                              │
-│  - Data Cleaning                                │
-└─────────────────────────────────────────────────┘
-\end{verbatim}
-\end{minipage}
+\fbox{\begin{minipage}{0.75\textwidth}
+\textbf{PRESENTATION LAYER}\\
+\textit{(ui\_components.py, visualization.py)}
+\begin{itemize}[noitemsep]
+    \item User Interface
+    \item Charts \& Display
+\end{itemize}
+\vspace{0.3cm}
+\centering $\downarrow$
+\vspace{0.3cm}
+
+\textbf{BUSINESS LOGIC LAYER}\\
+\textit{(strategies.py, backtest\_engine.py)}
+\begin{itemize}[noitemsep]
+    \item Trading Strategies
+    \item Backtest Execution
+    \item Performance Calculations
+\end{itemize}
+\vspace{0.3cm}
+\centering $\downarrow$
+\vspace{0.3cm}
+
+\textbf{DATA LAYER}\\
+\textit{(data\_loader.py)}
+\begin{itemize}[noitemsep]
+    \item CSV Loading
+    \item Data Validation
+    \item Data Cleaning
+\end{itemize}
+\end{minipage}}
 \caption{Three-Layer Architecture}
 \end{figure}
 
@@ -241,25 +249,42 @@ The application follows a \textbf{3-layer architecture} with clear separation of
 
 \begin{figure}[H]
 \centering
-\begin{verbatim}
+\begin{minipage}{0.7\textwidth}
+\centering
 User Upload CSV
-      ↓
-[DataLoader] ← Load & Validate
-      ↓
-[UI Components] ← Select Strategy & Parameters
-      ↓
-[StrategyFactory] ← Create Strategy Instance
-      ↓
-[Strategy] ← Generate Trading Signals
-      ↓
-[BacktestEngine] ← Execute Backtest
-      ↓
-[BacktestEngine] ← Calculate Metrics
-      ↓
-[Visualizer] ← Display Results
-      ↓
+
+$\downarrow$
+
+\texttt{[DataLoader]} $\leftarrow$ Load \& Validate
+
+$\downarrow$
+
+\texttt{[UI Components]} $\leftarrow$ Select Strategy \& Parameters
+
+$\downarrow$
+
+\texttt{[StrategyFactory]} $\leftarrow$ Create Strategy Instance
+
+$\downarrow$
+
+\texttt{[Strategy]} $\leftarrow$ Generate Trading Signals
+
+$\downarrow$
+
+\texttt{[BacktestEngine]} $\leftarrow$ Execute Backtest
+
+$\downarrow$
+
+\texttt{[BacktestEngine]} $\leftarrow$ Calculate Metrics
+
+$\downarrow$
+
+\texttt{[Visualizer]} $\leftarrow$ Display Results
+
+$\downarrow$
+
 User Views Results
-\end{verbatim}
+\end{minipage}
 \caption{Data Flow Through System}
 \end{figure}
 
@@ -272,7 +297,7 @@ The UI was designed following four key principles:
 
 \begin{itemize}
     \item \textbf{Consistency:} Uniform colors, fonts, and layout patterns throughout
-    \item \textbf{Clarity:} Step-by-step workflow (1️⃣, 2️⃣, 3️⃣), clear labels, help text on all inputs
+    \item \textbf{Clarity:} Step-by-step workflow (numbered steps), clear labels, help text on all inputs
     \item \textbf{User-Friendliness:} Progressive disclosure, error prevention, forgiving inputs
     \item \textbf{Accessibility:} High contrast, large clickable targets, logical flow
 \end{itemize}
@@ -295,7 +320,7 @@ The application guides users through six distinct screens:
 Several enhancements were implemented to improve user experience:
 
 \begin{itemize}[noitemsep]
-    \item Added emoji icons for visual hierarchy (1️⃣, 2️⃣, 3️⃣)
+    \item Added numbered icons for visual hierarchy (1, 2, 3)
     \item Implemented help tooltips on all parameter inputs
     \item Color-coded profit/loss (green for positive, red for negative)
     \item Form-based inputs to prevent unwanted application reruns
@@ -370,11 +395,13 @@ The Strategy pattern allows selecting trading algorithms at runtime without modi
 
 \begin{figure}[H]
 \centering
-\begin{verbatim}
-Strategy (Abstract)
-├── SMAStrategy (Concrete)
-└── RSIStrategy (Concrete)
-\end{verbatim}
+\begin{minipage}{0.6\textwidth}
+\textbf{Strategy} (Abstract)
+\begin{itemize}[leftmargin=2em]
+    \item SMAStrategy (Concrete)
+    \item RSIStrategy (Concrete)
+\end{itemize}
+\end{minipage}
 \caption{Strategy Pattern Implementation}
 \end{figure}
 
@@ -514,28 +541,30 @@ Difficult to extend & Simple to add new features \\ \bottomrule
 \newpage
 \section{Repository Structure}
 
+\begin{small}
 \begin{verbatim}
 stock-backtester/
-├── src/
-│   ├── app.py                 # Main application
-│   ├── data_loader.py         # Data layer
-│   ├── strategies.py          # Business logic
-│   ├── backtest_engine.py     # Business logic
-│   ├── visualization.py       # Presentation
-│   ├── ui_components.py       # Presentation
-│   └── requirements.txt       # Dependencies
-├── docs/
-│   └── design/
-│       ├── SOFTWARE_DESIGN_DOCUMENT.md    (18 pages)
-│       ├── DESIGN_PRINCIPLES.md           (8 pages)
-│       ├── DESIGN_DECISIONS.md            (13 pages)
-│       ├── UI_DESIGN.md                   (11 pages)
-│       ├── README.md                      (Summary)
-│       └── *.png                          (All diagrams)
-├── diagrams/                  # Architecture diagrams
-├── wireframes/                # Figma exports
-└── README.md                  # Main documentation
+  src/
+    app.py                 # Main application
+    data_loader.py         # Data layer
+    strategies.py          # Business logic
+    backtest_engine.py     # Business logic
+    visualization.py       # Presentation
+    ui_components.py       # Presentation
+    requirements.txt       # Dependencies
+  docs/
+    design/
+      SOFTWARE_DESIGN_DOCUMENT.md    (18 pages)
+      DESIGN_PRINCIPLES.md           (8 pages)
+      DESIGN_DECISIONS.md            (13 pages)
+      UI_DESIGN.md                   (11 pages)
+      README.md                      (Summary)
+      *.png                          (All diagrams)
+  diagrams/                # Architecture diagrams
+  wireframes/              # Figma exports
+  README.md                # Main documentation
 \end{verbatim}
+\end{small}
 
 \section{Tools Used}
 
