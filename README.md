@@ -256,6 +256,29 @@ pip install -r src/requirements.txt
 streamlit run src/app.py
 ```
 
+## DA3 Automated Testing (for screenshots)
+
+```bash
+pip install -r requirements-dev.txt
+```
+
+### Integration tests
+```bash
+python -m pytest -v tests/test_integration_pipeline.py
+```
+
+### Regression tests
+```bash
+python -m pytest -v tests/test_regression_backtest.py
+```
+
+### Mutation tests
+```bash
+python tools/run_mutation_tests.py
+```
+
+Detailed command guide: `docs/da3/TESTING_EVIDENCE_STEPS.md`
+
 
 ## Local Development Tools
 

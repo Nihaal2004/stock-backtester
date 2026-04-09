@@ -8,19 +8,35 @@ GitHub: https://github.com/Nihaal2004/stock-backtester
 
 ## 1. Integration / Regression / Mutation Testing (Screenshots)
 
-Add screenshots that prove each test type was executed.
+Run these commands from repository root, then capture screenshots of terminal output.
+
+```powershell
+python -m pip install -r requirements-dev.txt
+```
 
 ### 1.1 Integration Testing
-- Insert screenshot: `screenshots/<integration-test-proof>.png`
+- Run:
+  ```powershell
+  python -m pytest -v tests\test_integration_pipeline.py
+  ```
+- Save screenshot as: `screenshots/integration-test-proof.png`
 - Caption: End-to-end flow (data load -> strategy run -> results generation)
 
 ### 1.2 Regression Testing
-- Insert screenshot: `screenshots/<regression-test-proof>.png`
+- Run:
+  ```powershell
+  python -m pytest -v tests\test_regression_backtest.py
+  ```
+- Save screenshot as: `screenshots/regression-test-proof.png`
 - Caption: Existing behavior retained after changes
 
 ### 1.3 Mutation Testing
-- Insert screenshot: `screenshots/<mutation-test-proof>.png`
-- Caption: Mutation run and survived/killed mutants summary
+- Run:
+  ```powershell
+  python tools\run_mutation_tests.py
+  ```
+- Save screenshot as: `screenshots/mutation-test-proof.png`
+- Caption: Mutation harness run with killed/survived mutants summary
 
 ---
 
@@ -53,12 +69,14 @@ Use these available screenshots:
 
 | Category | Tools / Technologies |
 |---|---|
-| Programming Language | Python 3.11 |
+| Programming Language | Python 3.x |
 | UI Framework | Streamlit |
 | Data Processing | Pandas, NumPy |
 | Plotting / Visualization | Matplotlib |
 | Containerization | Docker, Docker Compose |
 | Version Control | Git, GitHub (PR + merge workflow) |
+| Automated Testing | Pytest |
+| Mutation Testing | Custom Python mutation harness (`tools/run_mutation_tests.py`) |
 | Documentation | Markdown, LaTeX |
 | Environment | Windows / PowerShell |
 
